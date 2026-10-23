@@ -1,0 +1,9 @@
+{
+  "name": "deadline-hollow-creek",
+  "version": "3.0.0",
+  "private": true,
+  "description": "DEADLINE — The Hollow Creek Murder",
+  "scripts": {
+    "start": "vercel dev"
+  }
+}

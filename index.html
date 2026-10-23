@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DEADLINE — The Hollow Creek Murder</title>
+  <meta name="description" content="Investigate the death of Jamie Mercer in a moody 1980s mystery. Question witnesses, search locations, collect clues, and name the killer.">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Cormorant+Garamond:wght@600;700&display=swap');
+    :root{
+      --bg:#081017; --panel:#101a22; --panel2:#13212b; --line:#31414c; --text:#ebe7df; --muted:#a8b0b4;
+      --red:#af5959; --gold:#d2ad79; --cyan:#92bfd1; --ghost:#aee9ff; --ok:#8bc195; --shadow:0 18px 60px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top right, rgba(115,173,196,.15), transparent 35%), radial-gradient(circle at left, rgba(175,89,89,.12), transparent 30%), var(--bg);color:var(--text);font:15px/1.55 'DM Sans',sans-serif;min-height:100vh}
+    img{max-width:100%;display:block}
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
+    .shell{max-width:1520px;margin:0 auto;padding:20px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:6px 0 18px;border-bottom:1px solid var(--line)}
+    .brand{font:700 38px/1 'Cormorant Garamond',serif;letter-spacing:2px}
+    .brand span{color:var(--red)}
+    .tag{font:11px 'DM Mono',monospace;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+    .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .btn{border:1px solid #4f6573;background:#22343f;color:#f3eee5;border-radius:8px;padding:11px 14px;font:500 12px 'DM Mono',monospace;letter-spacing:.8px}
+    .btn:hover{background:#2c4350}
+    .btn.primary{background:#9f4a4a;border-color:#b35a5a}
+    .btn.primary:hover{background:#b35858}
+    .layout{display:grid;grid-template-columns:280px minmax(0,1fr) 320px;gap:18px;margin-top:18px}
+    .panel{background:linear-gradient(180deg,#11202a,#0d171e);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+    .phead{padding:16px 18px;border-bottom:1px solid var(--line)}
+    .pbody{padding:16px 18px}
+    .left .pbody,.right .pbody{padding:14px}
+    .navtabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .tab{background:#1b2a34;border:1px solid #324753;border-radius:999px;color:#dae1e3;padding:10px 14px;font:500 11px 'DM Mono',monospace;letter-spacing:.8px;text-transform:uppercase}
+    .tab.active{background:#32495a;border-color:#7da2b1;color:white}
+    .hero{position:relative;overflow:hidden;border-radius:12px;border:1px solid #415866;min-height:290px;background:#061017;margin-top:16px}
+    .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.88}
+    .hero:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,9,13,.93) 0%,rgba(4,9,13,.60) 50%,rgba(4,9,13,.35) 100%)}
+    .hero-content{position:relative;z-index:1;padding:28px;max-width:700px}
+    .hero h1{font:700 50px/1.02 'Cormorant Garamond',serif;margin:0 0 10px}
+    .hero p{margin:0 0 12px;color:#d8dfdf}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .card{background:#16232c;border:1px solid #324551;border-radius:12px;padding:16px}
+    .card h3{margin:0 0 8px;font:700 25px/1.05 'Cormorant Garamond',serif}
+    .card p{margin:8px 0;color:#c3cbd0}
+    .steps li{margin:8px 0;color:#d8dfdf}
+    .character-list{display:grid;gap:10px}
+    .person-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#15232d;border:1px solid #314752;border-radius:12px;padding:10px;color:var(--text)}
+    .person-btn:hover{background:#1b2c38}
+    .person-btn.active{border-color:#8ab6c7;background:#223846}
+    .person-btn img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid #4f6876}
+    .person-btn strong{display:block;font-size:14px}
+    .person-btn small{display:block;color:var(--muted);font-size:11px;line-height:1.35;margin-top:2px}
+    .selected-person{display:flex;gap:18px;align-items:flex-start;background:linear-gradient(120deg,#233848,#131e27);border:1px solid #466171;border-radius:14px;padding:16px;margin-bottom:12px}
+    .selected-person img{width:110px;height:130px;object-fit:cover;border-radius:12px;border:1px solid #5a7281}
+    .selected-person h2{margin:0;font:700 34px/1 'Cormorant Garamond',serif}
+    .selected-person p{margin:8px 0;color:#d0d8da}
+    .chatbox{background:#091218;border:1px solid #2d414d;border-radius:12px;padding:14px;min-height:320px;max-height:440px;overflow:auto}
+    .bubble{max-width:85%;padding:12px 14px;border-radius:14px;margin:0 0 12px;background:#182832;border:1px solid #334752;white-space:pre-wrap}
+    .bubble.user{margin-left:auto;background:#2b3138;border-color:#545c65}
+    .speaker{font:10px 'DM Mono',monospace;letter-spacing:1px;color:#95bfce;margin-bottom:6px}
+    .bubble.user .speaker{color:#d3bc9d}
+    .chat-form{display:flex;gap:10px;margin-top:12px}
+    .chat-form textarea{flex:1;min-height:68px;max-height:140px;resize:vertical;border-radius:12px;background:#111c24;color:#f3efe8;border:1px solid #3f5562;padding:12px}
+    .fine{font-size:12px;color:var(--muted)}
+    .tempbox{background:#15242d;border:1px solid #3c525f;border-radius:12px;padding:14px}
+    .meter{width:100%;accent-color:#b25959}
+    .temp-value{font:700 26px 'Cormorant Garamond',serif;color:#f0c7a8}
+    .scale{display:flex;justify-content:space-between;font:11px 'DM Mono',monospace;color:#adbbc1}
+    .difficulty{margin-top:10px;padding:10px 12px;background:#0d171d;border:1px solid #2e404b;border-radius:10px;color:#d5dee0}
+    .stat{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .stat:last-child{border-bottom:none}
+    .evidence-item,.spirit-item{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .evidence-item:last-child,.spirit-item:last-child{border-bottom:none}
+    .evidence-item strong,.spirit-item strong{display:block;margin-bottom:6px;font-size:13px}
+    .locgrid,.chargrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .loccard,.charcard{background:#15222c;border:1px solid #344752;border-radius:14px;overflow:hidden}
+    .loccard img,.charcard img{width:100%;height:180px;object-fit:cover;border-bottom:1px solid #334651}
+    .loccard .content,.charcard .content{padding:14px}
+    .loccard h3,.charcard h3{margin:0 0 4px;font:700 28px/1 'Cormorant Garamond',serif}
+    .ghost-card{background:linear-gradient(180deg,#153344,#0f1d28);border-color:#5a8392}
+    .intro-overlay{position:fixed;inset:0;z-index:20;background:rgba(3,7,11,.92);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:16px}
+    .intro-panel{width:min(1080px,100%);max-height:94vh;overflow:auto;background:linear-gradient(180deg,#12212a,#0c171f);border:1px solid #496370;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.55)}
+    .intro-head{position:relative;min-height:240px;border-bottom:1px solid #364a55;overflow:hidden}
+    .intro-head img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+    .intro-head:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,10,15,.96) 0%,rgba(4,10,15,.62) 45%,rgba(4,10,15,.42) 100%)}
+    .intro-copy{position:relative;z-index:1;padding:28px;max-width:720px}
+    .intro-copy h1{font:700 54px/1 'Cormorant Garamond',serif;margin:8px 0 12px}
+    .intro-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;padding:18px}
+    .intro-section{background:#13212a;border:1px solid #364a56;border-radius:14px;padding:16px}
+    .intro-section h3{margin:0 0 10px;font:700 28px/1 'Cormorant Garamond',serif}
+    .report-mini{display:grid;grid-template-columns:1fr;gap:8px}
+    .report-mini .line{background:#0f1a21;border:1px solid #2d404c;border-radius:10px;padding:10px 12px}
+    .launch{padding:0 18px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+    .ghost-pop{position:fixed;right:22px;bottom:22px;width:min(430px,calc(100vw - 32px));z-index:15;background:linear-gradient(180deg,#10212a,#081118);border:1px solid #6690a0;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.48);overflow:hidden}
+    .ghost-top{display:flex;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(143,220,255,.12),transparent)}
+    .ghost-top img{width:76px;height:86px;border-radius:12px;border:1px solid #7dc6e4}
+    .ghost-name{font:700 30px/1 'Cormorant Garamond',serif;color:#dff4fb}
+    .ghost-body{padding:16px}
+    .ghost-bubble{background:#133042;border:1px solid #5d98ad;border-radius:14px;padding:14px 16px;color:#e6f7ff;line-height:1.6}
+    .ghost-note{margin-top:10px;font-size:12px;color:#afc5cf}
+    .banner{padding:14px 16px;border:1px solid #4c6a77;background:#192933;border-radius:12px;margin:12px 0;color:#dde5e7}
+    .report-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+    .report-layout img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid #445d6b}
+    .bullet{margin:8px 0;color:#d7dddf}
+    .solve-box{display:grid;gap:16px}
+    .solve-field{display:flex;gap:10px;flex-wrap:wrap}
+    .solve-field input{flex:1;min-width:260px;padding:14px 16px;border-radius:12px;background:#0f1a21;color:#f4efe8;border:1px solid #45606e}
+    .result-box{background:#14232d;border:1px solid #41606d;border-radius:14px;padding:16px}
+    .result-box h3{margin:0 0 8px;font:700 30px/1 'Cormorant Garamond',serif}
+    .ending{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+    .ending img{border-radius:14px;border:1px solid #576b74;min-height:280px;object-fit:cover}
+    .thanks{display:grid;gap:10px}
+    .thanks .card{padding:14px}
+    .flash{position:fixed;inset:0;background:rgba(173,229,255,.09);pointer-events:none;z-index:14;animation:flash .8s ease-out forwards}
+    @keyframes flash{from{opacity:1}to{opacity:0}}
+    @media (max-width:1180px){.layout{grid-template-columns:1fr}.left,.right{order:2}.center{order:1}.intro-grid,.report-layout,.ending,.grid2,.locgrid,.chargrid{grid-template-columns:1fr}}
+    @media (max-width:720px){.shell{padding:12px}.hero h1,.intro-copy h1{font-size:40px}.selected-person{flex-direction:column}.chat-form{flex-direction:column}.topbar{align-items:flex-start}.solve-field{flex-direction:column}.person-btn img{width:48px;height:48px}}
+  </style>
+</head>
+<body>
+  <div class="intro-overlay" id="introOverlay">
+    <div class="intro-panel">
+      <div class="intro-head">
+        <img src="assets/town.svg" alt="Hollow Creek at night">
+        <div class="intro-copy">
+          <div class="tag">Interactive Mystery Experience</div>
+          <h1>DEADLINE — The Hollow Creek Murder</h1>
+          <p>You are the detective. Jamie Mercer, a gentle nineteen-year-old from Hollow Creek, has been found dead by the lake. The police first called it an accident. You are here to find out who really killed him.</p>
+          <p><strong>Your objective:</strong> interview witnesses and suspects, investigate locations, collect evidence, read the spirit notes Jamie leaves behind, and finally enter the murderer’s name.</p>
+        </div>
+      </div>
+      <div class="intro-grid">
+        <div class="intro-section">
+          <h3>Who you are and what you can do</h3>
+          <ol class="steps">
+            <li>Read the police report and Jamie’s story.</li>
+            <li>Question the people of Hollow Creek. They will share what they know, but they will not solve the case for you.</li>
+            <li>Search the lake, boathouse, school, garage, diner, and Jamie’s home for clues.</li>
+            <li>Watch for Jamie’s ghost. He does not chat with you directly. Instead, he appears from time to time and leaves hints in a speech bubble. Every hint is saved in the <strong>Spirit File</strong>.</li>
+            <li>When you think you know the truth, enter the killer’s name in the Solve tab.</li>
+          </ol>
+        </div>
+        <div class="intro-section">
+          <h3>How the Temperature Bar works</h3>
+          <p><strong>Low temperature</strong> = clear, direct, factual cues. Easier to finish in about <strong>15–25 minutes</strong>.</p>
+          <p><strong>High temperature</strong> = more creative, abstract, emotionally layered cues. Harder to finish, often closer to <strong>60–90 minutes</strong>.</p>
+          <p class="fine">Important: the slider changes the <em>style and difficulty</em> of hints and interviews, not the identity of the killer.</p>
+          <div class="report-mini">
+            <div class="line"><strong>Jamie Mercer</strong><br><span class="fine">A thoughtful young man, loved by his mother, trusted by friends, and pulled into a secret he should never have discovered.</span></div>
+            <div class="line"><strong>Why this case matters</strong><br><span class="fine">This is not just about naming a suspect. It is about giving Jamie dignity, truth, and peace.</span></div>
+          </div>
+        </div>
+        <div class="intro-section">
+          <h3>Police discovery report — shown at the very beginning</h3>
+          <div class="report-mini">
+            <div class="line"><strong>Victim:</strong> Jamie Mercer, male, age 19</div>
+            <div class="line"><strong>Found:</strong> 6:18 AM, Saturday, October 17, 1987</div>
+            <div class="line"><strong>Found by:</strong> Elias Turner, local fisherman</div>
+            <div class="line"><strong>Location:</strong> south bank of Blackwater Lake</div>
+            <div class="line"><strong>Initial police theory:</strong> accidental drowning</div>
+            <div class="line"><strong>Irregularities:</strong> watch stopped at 11:47 PM, Jamie’s car parked away from shore, marks inconsistent with a simple fall</div>
+          </div>
+        </div>
+        <div class="intro-section">
+          <h3>Jamie’s story</h3>
+          <p>Jamie Mercer was bright, kind, and quietly brave. He worked odd jobs, cared deeply for his mother, and believed the town could be better than the secrets it protected.</p>
+          <p>On the day before he died, Jamie became frightened. He had found something he could not ignore. He planned to tell the truth on Monday. He never got that chance.</p>
+          <p class="fine">The rest is for you to uncover.</p>
+        </div>
+      </div>
+      <div class="launch">
+        <div class="fine">All gameplay is in English. Your progress is stored in this browser.</div>
+        <button class="btn primary" id="beginGame">Begin Investigation →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <div class="brand">DEAD<span>LINE</span></div>
+        <div class="tag">The Hollow Creek Murder · Hollow Creek, Oregon · October 1987</div>
+      </div>
+      <div class="top-actions">
+        <div class="tag">Progress saved locally</div>
+        <button class="btn" id="demoBtn">Quick Start</button>
+        <button class="btn" id="resetBtn">Restart Case</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="panel left">
+        <div class="phead">
+          <div class="tag">People you can interview</div>
+          <div style="margin-top:6px;font:700 28px/1 'Cormorant Garamond',serif">Witnesses & Suspects</div>
+        </div>
+        <div class="pbody">
+          <div class="character-list" id="personList"></div>
+        </div>
+      </aside>
+
+      <main class="panel center">
+        <div class="phead">
+          <div class="tag" id="viewTag">Case Overview</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-top:6px">
+            <div style="font:700 34px/1 'Cormorant Garamond',serif" id="viewTitle">Welcome, Detective</div>
+            <div class="navtabs">
+              <button class="tab active" data-view="overview">Overview</button>
+              <button class="tab" data-view="police">Police Report</button>
+              <button class="tab" data-view="characters">Characters</button>
+              <button class="tab" data-view="locations">Locations</button>
+              <button class="tab" data-view="interviews">Interviews</button>
+              <button class="tab" data-view="casefile">Case File</button>
+              <button class="tab" data-view="solve">Solve</button>
+            </div>
+          </div>
+        </div>
+        <div class="pbody">
+          <section id="view-overview">
+            <div class="hero">
+              <img src="assets/town.svg" alt="Hollow Creek overview">
+              <div class="hero-content">
+                <div class="tag">Your mission</div>
+                <h1>Find the truth behind Jamie Mercer’s death</h1>
+                <p>Question the town. Search the places that mattered. Listen when the dead speak. Every fact you need exists somewhere in Hollow Creek — but nobody will hand you the answer.</p>
+                <p><strong>You are the detective.</strong> The police report gives you a starting point. The people of Hollow Creek give you fragments. Jamie’s spirit gives you guidance. The final accusation is yours.</p>
+              </div>
+            </div>
+            <div class="grid2" style="margin-top:18px">
+              <div class="card">
+                <h3>Jamie Mercer’s life</h3>
+                <p>Jamie was nineteen. He helped his mother around the house, did occasional work in town, and carried a quiet sense of responsibility that made people trust him. He was not reckless. He was not looking for danger.</p>
+                <p>In the last days of his life, Jamie uncovered information that made him deeply uneasy. He wanted to do the right thing. He wanted to bring it into the open. That choice cost him his life.</p>
+              </div>
+              <div class="card">
+                <h3>How to solve the case</h3>
+                <ol class="steps">
+                  <li>Read the official discovery details in the Police Report tab.</li>
+                  <li>Use the Interviews tab to speak with people in town.</li>
+                  <li>Use the Locations tab to search for physical evidence.</li>
+                  <li>Review your Evidence File and Spirit File in the Case File tab.</li>
+                  <li>Enter the murderer’s name in the Solve tab when you are ready.</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+
+          <section id="view-police" class="hidden">
+            <div class="report-layout">
+              <img src="assets/report.svg" alt="Police report illustration">
+              <div class="card">
+                <h3>Initial Death Discovery</h3>
+                <p class="bullet"><strong>Victim:</strong> Jamie Mercer, 19</p>
+                <p class="bullet"><strong>Date discovered:</strong> Saturday, October 17, 1987</p>
+                <p class="bullet"><strong>Time discovered:</strong> 6:18 AM</p>
+                <p class="bullet"><strong>Discovered by:</strong> Elias Turner, local fisherman</p>
+                <p class="bullet"><strong>Body location:</strong> south bank of Blackwater Lake</p>
+                <p class="bullet"><strong>Initial theory:</strong> accidental drowning</p>
+                <p class="bullet"><strong>Concerns already noted by police:</strong></p>
+                <ul>
+                  <li>Jamie’s wristwatch stopped at <strong>11:47 PM</strong>.</li>
+                  <li>His car was found parked <strong>away from the immediate shoreline</strong>.</li>
+                  <li>There were marks on his body that seem <strong>inconsistent with a simple fall into the lake</strong>.</li>
+                  <li>The old boathouse path nearby showed signs of recent movement.</li>
+                </ul>
+                <div class="banner">Start here if you feel lost. These are the official facts you know before your own investigation begins.</div>
+              </div>
+            </div>
+          </section>
+
+          <section id="view-characters" class="hidden">
+            <div class="chargrid" id="characterGrid"></div>
+          </section>
+
+          <section id="view-locations" class="hidden">
+            <div class="locgrid" id="locationGrid"></div>
+          </section>
+
+          <section id="view-interviews" class="hidden">
+            <div class="selected-person" id="selectedPerson"></div>
+            <div class="chatbox" id="chatLog"></div>
+            <form class="chat-form" id="chatForm">
+              <textarea id="chatInput" placeholder="Ask a question in English. Example: Where were you on Friday night?"></textarea>
+              <button class="btn primary" type="submit" id="sendBtn">Send →</button>
+            </form>
+            <div class="fine" id="chatFine" style="margin-top:8px">Characters answer from their own point of view. They can help, misremember, hide, or deflect — but they do not solve the case for you.</div>
+          </section>
+
+          <section id="view-casefile" class="hidden">
+            <div class="grid2">
+              <div class="card">
+                <h3>Evidence File</h3>
+                <div id="evidenceList"></div>
+              </div>
+              <div class="card">
+                <h3>Spirit File</h3>
+                <p class="fine">Whenever Jamie appears, his words are saved here.</p>
+                <div id="spiritList"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="view-solve" class="hidden">
+            <div class="solve-box">
+              <div class="card">
+                <h3>Name the murderer</h3>
+                <p>If you believe you know who killed Jamie Mercer, enter the killer’s name below. You only need the name.</p>
+                <form id="solveForm">
+                  <div class="solve-field">
+                    <input id="killerInput" type="text" placeholder="Type the killer's name here">
+                    <button class="btn primary" type="submit">Submit Name</button>
+                  </div>
+                </form>
+              </div>
+              <div id="solveResult" class="result-box hidden"></div>
+              <div id="endingBlock" class="hidden">
+                <div class="ending">
+                  <img src="assets/funeral.svg" alt="A peaceful memorial service for Jamie Mercer">
+                  <div class="thanks" id="thanksList"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="panel right">
+        <div class="phead">
+          <div class="tag">Case tools</div>
+          <div style="margin-top:6px;font:700 28px/1 'Cormorant Garamond',serif">Investigation Controls</div>
+        </div>
+        <div class="pbody">
+          <div class="tempbox">
+            <div style="display:flex;justify-content:space-between;align-items:end;gap:12px">
+              <div>
+                <div class="tag">Temperature</div>
+                <div style="font:700 28px/1 'Cormorant Garamond',serif">Hint & dialogue style</div>
+              </div>
+              <div class="temp-value" id="tempValue">0.7</div>
+            </div>
+            <input class="meter" id="tempSlider" type="range" min="0" max="2" step="0.1" value="0.7">
+            <div class="scale"><span>Low: clear & easy</span><span>High: cryptic & hard</span></div>
+            <div class="difficulty" id="tempDescription"></div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h3>Progress</h3>
+            <div class="stat"><span>Evidence found</span><strong id="evidenceCount">0</strong></div>
+            <div class="stat"><span>Spirit notes</span><strong id="spiritCount">0</strong></div>
+            <div class="stat"><span>Locations searched</span><strong id="locationCount">0</strong></div>
+            <div class="stat"><span>Interviews started</span><strong id="interviewCount">0</strong></div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h3>What the slider changes</h3>
+            <p><strong>Low:</strong> Jamie’s spirit speaks more directly and witnesses answer more plainly.</p>
+            <p><strong>High:</strong> Jamie’s hints become more abstract and witnesses may speak more subtly or emotionally.</p>
+            <p class="fine">The killer never changes.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="ghost-pop hidden" id="ghostPopup">
+    <div class="ghost-top">
+      <img src="assets/jamie.svg" alt="Jamie Mercer ghost portrait">
+      <div>
+        <div class="tag" style="color:#cbe8f2">Spirit Manifestation</div>
+        <div class="ghost-name">Jamie Mercer</div>
+        <div class="fine" style="color:#c9dde4">A hint from the dead</div>
+      </div>
+    </div>
+    <div class="ghost-body">
+      <div class="ghost-bubble" id="ghostText"></div>
+      <div class="ghost-note">This message has been added to your Spirit File.</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn" id="closeGhost">Continue Investigation</button></div>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const PEOPLE = {
+      miller:{name:'Officer Frank Miller', role:'Police partner', image:'assets/miller.svg', blurb:'A seasoned local officer. Honest, practical, and helpful, but not all-knowing.', interviewHint:'Ask about the official report, inconsistencies, or what police noticed.'},
+      sarah:{name:'Sarah Collins', role:'Best friend / witness', image:'assets/sarah.svg', blurb:'Jamie’s best friend. Grieving, defensive, and hiding uncertainty.', interviewHint:'Ask what she saw by the lake and how certain she really is.'},
+      robert:{name:'Robert Hayes', role:'Garage owner', image:'assets/robert.svg', blurb:'Gruff and suspicious. He has reasons to sound guilty, but may be hiding the wrong thing.', interviewHint:'Ask about Jamie, sealed boxes, and the argument in the garage.'},
+      nathan:{name:'Nathan Brooks', role:'Former boyfriend', image:'assets/nathan.svg', blurb:'Jealous, sharp-tongued, and easy to suspect.', interviewHint:'Ask about Sarah, Friday night, and where he was close to midnight.'},
+      evelyn:{name:'Evelyn Price', role:'Principal', image:'assets/evelyn.svg', blurb:'Respected, polished, and difficult to read. She appears deeply concerned by Jamie’s death.', interviewHint:'Ask about Jamie, the school, scholarship records, and Friday night.'},
+      linda:{name:'Linda Mercer', role:'Jamie’s mother', image:'assets/linda.svg', blurb:'Heartbroken, warm, and determined to know the truth about her son.', interviewHint:'Ask about Jamie’s mood, belongings, and anything he left behind.'},
+      jamie:{name:'Jamie Mercer', role:'The spirit of the victim', image:'assets/jamie.svg', blurb:'Jamie does not chat directly. He appears at key moments and leaves hints from beyond.'}
+    };
+
+    const LOCATIONS = {
+      lake:{name:'Blackwater Lake', image:'assets/lake.svg', description:'The place where Jamie was found at dawn.', clues:['watch','tire']},
+      boathouse:{name:'Old Boathouse', image:'assets/boathouse.svg', description:'A weathered building near the shore. Something happened here before the water.', clues:['lantern']},
+      home:{name:'Mercer House', image:'assets/home.svg', description:'Jamie’s home, preserved almost exactly as he left it.', clues:['letter']},
+      garage:{name:'Hayes Garage', image:'assets/garage.svg', description:'Robert’s garage, where hidden paperwork sat unnoticed.', clues:['ledger']},
+      school:{name:'Hollow Creek High', image:'assets/school.svg', description:'The school office — calm on the surface, and full of records underneath.', clues:['calendar','mud']},
+      diner:{name:'Stardust Diner', image:'assets/diner.svg', description:'A late-night stop where alibis can be tested.', clues:['diner']}
+    };
+
+    const CLUES = {
+      watch:{title:'Stopped Wristwatch', text:'Jamie’s watch stopped at exactly 11:47 PM. The stopped time may mark the moment of the fatal attack.'},
+      tire:{title:'Second Vehicle Track', text:'A fresh narrow tire track near the restricted boathouse path suggests another vehicle was there late that night.'},
+      lantern:{title:'Damaged Brass Lantern', text:'A heavy brass lantern from the boathouse is dented. A thread caught on it matches the weave of Jamie’s jacket.'},
+      letter:{title:'Unsent Letter to the Gazette', text:'Jamie wrote a letter describing suspicious scholarship-fund withdrawals. He planned to take it to the local newspaper.'},
+      ledger:{title:'Scholarship Ledger Copies', text:'The copied ledgers reveal repeated withdrawals and suspicious transactions tied to school funds.'},
+      calendar:{title:'Private Appointment Slip', text:'A note in the principal’s office mentions a private dock meeting with “J.M.” on Friday at 11:30 PM.'},
+      mud:{title:'Lake Mud on a Car Mat', text:'Mud matching the boathouse access road is embedded in the driver-side mat of Evelyn Price’s car.'},
+      diner:{title:'Late-night Diner Receipt', text:'Nathan paid at the Stardust Diner at 11:55 PM, supporting his alibi for the critical time window.'}
+    };
+
+    const GHOST_EVENTS = [
+      {
+        id:'start',
+        when: s => s.started && !s.eventFlags.start,
+        low:'I remember the cold wood before the water. Don’t start with the lake alone. Something important happened near the boathouse first.',
+        mid:'Before the water, there was wood under my shoes and a feeling that the night had already turned wrong. The boathouse matters.',
+        high:'People remember the lake because it was visible. They forget the boards, the darkness, and the place where the night truly changed.',
+      },
+      {
+        id:'home',
+        when: s => s.evidence.includes('letter') && !s.eventFlags.home,
+        low:'Thank you for going to my house. My mother kept the letter I never sent. What I found out was not personal gossip — it was about money and trust.',
+        mid:'The paper in my room mattered because it tied fear to purpose. I was scared, but I still meant to tell the truth.',
+        high:'What I left behind was not a confession. It was a promise written in private, pointing toward a theft wrapped in respectability.',
+      },
+      {
+        id:'sarah',
+        when: s => s.interviewed.includes('sarah') && !s.eventFlags.sarah,
+        low:'Sarah is not lying on purpose. She saw shapes in bad light. Ask her how far away she was and whether she could clearly see who was moving.',
+        mid:'Sarah carries guilt because memory and certainty are not the same thing. Press gently on distance, darkness, and what she assumed.',
+        high:'A witness can speak honestly and still be wrong. Night reshapes certainty. What she saw may be true in outline and false in meaning.',
+      },
+      {
+        id:'school',
+        when: s => s.evidence.includes('calendar') && s.evidence.includes('mud') && !s.eventFlags.school,
+        low:'The school office connects the meeting and the road to the lake. Someone arranged that meeting and then went there.',
+        mid:'A schedule and a stain can say more than a confession. One planned the meeting. One drove to the place where I died. They belong together.',
+        high:'Paper planned it. Mud remembered it. Some lies are written in calendars before they are carried home on a shoe or a car mat.',
+      },
+      {
+        id:'late',
+        when: s => s.evidence.length >= 6 && !s.eventFlags.late,
+        low:'You are close. Follow the person with motive, the private meeting, and the physical evidence from the boathouse. The answer is one person, not a group.',
+        mid:'You have enough now to stop drifting between suspects. Find the person whose motive, appointment, and physical trail all converge.',
+        high:'When grief, greed, and the place of death all point to the same figure, uncertainty becomes a choice. Look where all three lines meet.',
+      }
+    ];
+
+    const STORAGE_KEY = 'deadline_v3';
+    const initial = () => ({
+      started:false, view:'overview', selected:'miller', temperature:0.7, evidence:[], spiritNotes:[], searched:[], interviewed:[], solved:false, solvedName:'', eventFlags:{}, history:{}, tempLocked:false
+    });
+    let state;
+    try { state = {...initial(), ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')}; }
+    catch { state = initial(); }
+    if(!state.eventFlags) state.eventFlags={};
+    if(!state.history) state.history={};
+
+    const $ = id => document.getElementById(id);
+    const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const cap = s => String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+    function flash(){ const d=document.createElement('div'); d.className='flash'; document.body.appendChild(d); setTimeout(()=>d.remove(),800); }
+    function modeBand(temp){ return temp <= 0.6 ? 'low' : temp < 1.3 ? 'mid' : 'high'; }
+    function lockTemperature(){ if(!state.tempLocked){ state.tempLocked=true; save(); updateTemperature(); } }
+
+    function renderLeft(){
+      const ids = ['miller','sarah','robert','nathan','evelyn','linda'];
+      $('personList').innerHTML = ids.map(id => {
+        const p=PEOPLE[id];
+        return `<button class="person-btn ${state.selected===id?'active':''}" data-person="${id}">
+          <img src="${p.image}" alt="${cap(p.name)} portrait">
+          <span><strong>${cap(p.name)}</strong><small>${cap(p.role)}<br>${cap(p.blurb)}</small></span>
+        </button>`;
+      }).join('');
+      document.querySelectorAll('[data-person]').forEach(btn => btn.onclick = () => { state.selected=btn.dataset.person; state.view='interviews'; save(); render(); });
+    }
+
+    function setView(view){ state.view=view; save(); render(); }
+
+    function renderHeader(){
+      const meta = {
+        overview:['Case Overview','Welcome, Detective'],
+        police:['Official File','Police Report'],
+        characters:['People of Hollow Creek','Character Directory'],
+        locations:['Field Work','Search Locations'],
+        interviews:['Interrogation Room', PEOPLE[state.selected].name],
+        casefile:['Investigation Records','Evidence File & Spirit File'],
+        solve:['Final Accusation','Name the Killer']
+      }[state.view];
+      $('viewTag').textContent = meta[0];
+      $('viewTitle').textContent = meta[1];
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === state.view));
+      for(const id of ['overview','police','characters','locations','interviews','casefile','solve']){
+        $('view-'+id).classList.toggle('hidden', id !== state.view);
+      }
+    }
+
+    function renderCharacters(){
+      const cards = ['jamie','miller','sarah','robert','nathan','evelyn','linda'].map(id => {
+        const p=PEOPLE[id];
+        const extra = id==='jamie'
+          ? 'Jamie appears on his own. He does not solve the case. He only gives occasional hints, and each hint is saved in your Spirit File.'
+          : `If this person knows something important, they can give it to you — but they will not solve the murder on your behalf.`;
+        return `<div class="charcard ${id==='jamie'?'ghost-card':''}">
+          <img src="${p.image}" alt="${cap(p.name)}">
+          <div class="content">
+            <h3>${cap(p.name)}</h3>
+            <div class="tag" style="margin-bottom:8px">${cap(p.role)}</div>
+            <p>${cap(p.blurb)}</p>
+            <p class="fine">${cap(extra)}</p>
+          </div>
+        </div>`;
+      }).join('');
+      $('characterGrid').innerHTML = cards;
+    }
+
+    function searchLocation(id){
+      lockTemperature();
+      if(!state.searched.includes(id)) state.searched.push(id);
+      const fresh = LOCATIONS[id].clues.filter(c => !state.evidence.includes(c));
+      fresh.forEach(c => state.evidence.push(c));
+      save();
+      render();
+      const msg = fresh.length
+        ? `You searched ${LOCATIONS[id].name} and found:\n\n` + fresh.map(c => `• ${CLUES[c].title}`).join('\n')
+        : `You searched ${LOCATIONS[id].name} again. No new evidence was found.`;
+      alert(msg);
+      checkGhost();
+    }
+
+    function renderLocations(){
+      $('locationGrid').innerHTML = Object.entries(LOCATIONS).map(([id,loc]) => `
+        <div class="loccard">
+          <img src="${loc.image}" alt="${cap(loc.name)}">
+          <div class="content">
+            <h3>${cap(loc.name)}</h3>
+            <p>${cap(loc.description)}</p>
+            <p class="fine">${state.searched.includes(id) ? 'Already searched. You can revisit it.' : 'Search this place for evidence.'}</p>
+            <button class="btn" data-location="${id}">${state.searched.includes(id)?'Search Again':'Search Location'}</button>
+          </div>
+        </div>`).join('');
+      document.querySelectorAll('[data-location]').forEach(btn => btn.onclick = () => searchLocation(btn.dataset.location));
+    }
+
+    function renderInterview(){
+      const p=PEOPLE[state.selected];
+      $('selectedPerson').innerHTML = `
+        <img src="${p.image}" alt="${cap(p.name)}">
+        <div>
+          <div class="tag">Interview Target</div>
+          <h2>${cap(p.name)}</h2>
+          <p><strong>${cap(p.role)}</strong></p>
+          <p>${cap(p.blurb)}</p>
+          <p class="fine">${cap(p.interviewHint)}</p>
+        </div>`;
+      const hist = state.history[state.selected] || [];
+      if(!hist.length){
+        const opening = state.selected === 'miller'
+          ? 'Detective, I’ll share what I can. The report looks wrong to me. Ask what you need.'
+          : `I know why you’re here. Ask your questions, Detective.`;
+        $('chatLog').innerHTML = `<div class="bubble"><div class="speaker">${cap(p.name.toUpperCase())}</div>${cap(opening)}</div>`;
+      } else {
+        $('chatLog').innerHTML = hist.map(m => `<div class="bubble ${m.role==='user'?'user':''}"><div class="speaker">${m.role==='user'?'YOU — DETECTIVE':cap(p.name.toUpperCase())}</div>${cap(m.content)}</div>`).join('');
+      }
+      $('chatLog').scrollTop = $('chatLog').scrollHeight;
+    }
+
+    function renderCaseFile(){
+      $('evidenceList').innerHTML = state.evidence.length
+        ? state.evidence.map(id => `<div class="evidence-item"><strong>${cap(CLUES[id].title)}</strong><div>${cap(CLUES[id].text)}</div></div>`).join('')
+        : '<div class="fine">No evidence collected yet. Search locations to begin building your case.</div>';
+      $('spiritList').innerHTML = state.spiritNotes.length
+        ? state.spiritNotes.map((note, i) => `<div class="spirit-item"><strong>Spirit Note ${i+1}</strong><div>${cap(note)}</div></div>`).join('')
+        : '<div class="fine">Jamie has not appeared yet. Continue the investigation.</div>';
+    }
+
+    function updateProgress(){
+      $('evidenceCount').textContent = String(state.evidence.length);
+      $('spiritCount').textContent = String(state.spiritNotes.length);
+      $('locationCount').textContent = String(state.searched.length);
+      $('interviewCount').textContent = String(state.interviewed.length);
+    }
+
+    function updateTemperature(){
+      $('tempSlider').value = state.temperature;
+      $('tempValue').textContent = Number(state.temperature).toFixed(1);
+      const band = modeBand(state.temperature);
+      const text = {
+        low:'LOW — straightforward, factual guidance. Ghost clues are direct. Characters tend to answer in a clearer and easier-to-follow way. Best for a quick investigation, often around 15–25 minutes.',
+        mid:'MEDIUM — balanced difficulty. Clues are meaningful but not too obvious. Characters sound natural and occasionally subtle. A normal playthrough often takes 35–60 minutes.',
+        high:'HIGH — creative and abstract guidance. Jamie’s spirit speaks more poetically, and characters may answer more subtly. Best for a deeper and harder experience, often 60–90 minutes.'
+      }[band];
+      $('tempDescription').textContent = text + (state.tempLocked ? ' Temperature is now locked because your investigation has started.' : ' You can still change this before your first real action.');
+      $('tempSlider').disabled = !!state.tempLocked;
+    }
+
+    function triggerGhost(message){
+      state.spiritNotes.push(message);
+      save();
+      $('ghostText').textContent = message;
+      $('ghostPopup').classList.remove('hidden');
+      flash();
+      renderCaseFile();
+      updateProgress();
+    }
+
+    function checkGhost(){
+      for(const event of GHOST_EVENTS){
+        if(event.when(state)){
+          state.eventFlags[event.id] = true;
+          const msg = event[modeBand(state.temperature)];
+          triggerGhost(msg);
+          return;
+        }
+      }
+    }
+
+    async function sendMessage(e){
+      e.preventDefault();
+      const input = $('chatInput');
+      const msg = input.value.trim();
+      if(!msg) return;
+      lockTemperature();
+      const person = state.selected;
+      if(!state.interviewed.includes(person)) state.interviewed.push(person);
+      (state.history[person] ||= []).push({role:'user', content:msg});
+      const shortHistory = (state.history[person] || []).slice(0, -1).slice(-10);
+      input.value='';
+      save();
+      render();
+      $('sendBtn').disabled = true;
+      $('sendBtn').textContent = 'Sending…';
+      try{
+        const resp = await fetch('/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            character: person,
+            message: msg,
+            temperature: state.temperature,
+            evidence: state.evidence,
+            history: shortHistory
+          })
+        });
+        const data = await resp.json();
+        if(!resp.ok) throw new Error(data.error || 'Request failed');
+        (state.history[person] ||= []).push({role:'assistant', content:data.reply});
+        save();
+        render();
+        checkGhost();
+      } catch(err) {
+        (state.history[person] ||= []).push({role:'assistant', content:`The line goes quiet for a moment. (${err.message})`});
+        save();
+        render();
+      } finally {
+        $('sendBtn').disabled = false;
+        $('sendBtn').textContent = 'Send →';
+      }
+    }
+
+    async function solveCase(e){
+      e.preventDefault();
+      const input = $('killerInput');
+      const value = input.value.trim();
+      if(!value) return;
+      const result = $('solveResult');
+      const ending = $('endingBlock');
+      result.classList.remove('hidden');
+      result.innerHTML = '<h3>Checking your answer…</h3><p>Please wait.</p>';
+      try{
+        const resp = await fetch('/api/verdict', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({name:value, evidence:state.evidence, spiritNotes:state.spiritNotes})
+        });
+        const data = await resp.json();
+        if(!resp.ok) throw new Error(data.error || 'Could not verify answer');
+        if(data.solved){
+          state.solved = true; state.solvedName = value; save();
+          result.innerHTML = `<h3>Case Solved</h3><p>${cap(data.message)}</p>`;
+          $('thanksList').innerHTML = `
+            <div class="card"><h3>Jamie Mercer</h3><p>“Thank you, Detective. You gave me back my name, my truth, and a way to be remembered with love instead of fear.”</p></div>
+            <div class="card"><h3>Linda Mercer</h3><p>“You gave my son justice. I will never forget that.”</p></div>
+            <div class="card"><h3>Officer Frank Miller</h3><p>“Good work. You saw what the town was too ready to miss.”</p></div>
+            <div class="card"><h3>Sarah Collins</h3><p>“Now I can stop wondering if the truth would ever come out. Thank you.”</p></div>`;
+          ending.classList.remove('hidden');
+          flash();
+        } else {
+          result.innerHTML = `<h3>Not solved yet</h3><p>${cap(data.message)}</p>`;
+          ending.classList.add('hidden');
+        }
+      } catch(err){
+        result.innerHTML = `<h3>Verification error</h3><p>${cap(err.message)}</p>`;
+      }
+    }
+
+    function quickStart(){
+      if(!confirm('Quick Start adds a few early clues so you can explore the experience faster. Continue?')) return;
+      state.started = true;
+      state.tempLocked = false;
+      ['watch','letter','diner'].forEach(id => { if(!state.evidence.includes(id)) state.evidence.push(id); });
+      ['lake','home','diner'].forEach(id => { if(!state.searched.includes(id)) state.searched.push(id); });
+      if(!state.eventFlags.start) state.eventFlags.start = true;
+      if(state.spiritNotes.length === 0) state.spiritNotes.push(GHOST_EVENTS[0][modeBand(state.temperature)]);
+      state.view='casefile';
+      save();
+      render();
+    }
+
+    function resetCase(){
+      if(!confirm('Restart the entire case? This clears your progress in this browser.')) return;
+      state = initial();
+      save();
+      location.reload();
+    }
+
+    function render(){
+      renderLeft();
+      renderHeader();
+      renderCharacters();
+      renderLocations();
+      renderInterview();
+      renderCaseFile();
+      updateProgress();
+      updateTemperature();
+      $('introOverlay').classList.toggle('hidden', state.started);
+    }
+
+    $('beginGame').onclick = () => {
+      state.started = true;
+      save();
+      render();
+      checkGhost();
+    };
+    $('demoBtn').onclick = quickStart;
+    $('resetBtn').onclick = resetCase;
+    $('chatForm').onsubmit = sendMessage;
+    $('solveForm').onsubmit = solveCase;
+    $('closeGhost').onclick = () => $('ghostPopup').classList.add('hidden');
+    $('tempSlider').oninput = e => { state.temperature = Number(e.target.value); save(); updateTemperature(); };
+    $('chatInput').addEventListener('keydown', e => {
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $('chatForm').requestSubmit(); }
+    });
+    document.querySelectorAll('.tab').forEach(tab => tab.onclick = () => setView(tab.dataset.view));
+
+    render();
+  })();
+  </script>
+</body>
+</html>
